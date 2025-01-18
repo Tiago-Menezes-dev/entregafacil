@@ -1,0 +1,321 @@
+<div class="flex w-full justify-between gap-2 mb-4">
+  <div class="flex gap-2">
+    <div class="relative w-52">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa-solid fa-hashtag text-gray-400"></i>
+      </div>
+      <input
+        (input)="onOrderIdFilterChange($event)"
+        [value]="orderIdFilter"
+        type="text"
+        id="order-id-filter"
+        class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block pl-10 p-2.5"
+        placeholder="Id"
+        required
+      />
+    </div>
+    <div class="relative w-64">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa-solid fa-user text-gray-400"></i>
+      </div>
+      <input
+        (input)="onClientNameFilterChange($event)"
+        [value]="clientNameFilter"
+        type="text"
+        id="client-name-filter"
+        class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block pl-10 p-2.5"
+        placeholder="Cliente"
+        required
+      />
+    </div>
+  </div>
+
+  @if (hasFilters) {
+    <button
+      (click)="clearFilters()"
+      class="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors text-sm"
+    >
+      <i class="fa-solid fa-xmark mr-2"></i>
+      Limpar filtros
+    </button>
+  }
+</div>
+<div class="kanban-board grid grid-cols-3 gap-4">
+
+  <div
+    class="kanban-column rounded-lg p-4 max-h-[70vh] flex flex-col custom-scrollbar bg-gray-100"
+  >
+    <div class="flex items-center gap-2 mb-4 pl-2 text-base">
+      <i class="fa-regular fa-circle text-blue-700"></i>
+      <span class="font-semibold text-neutral-700">Em análise</span>
+    </div>
+
+    <div class="overflow-y-auto space-y-3 p-2 thin-scrollbar">
+      @for (order of ordersEmAnalise; track order.id) {
+      <div
+        class="hover:drop-shadow-md active:scale-95 cursor-pointer kanban-card bg-gray-50 rounded-lg p-4 flex flex-col shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+        (click)="openOrderDialog(order)"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-neutral-800">#{{ order.id }}</span>
+          <span class="text-sm text-neutral-500">{{
+            order.data | date : "dd/MM/yyyy"
+          }}</span>
+        </div>
+        <p class="text-neutral-600 text-sm mb-2">
+          Cliente: {{ order.cliente }}
+        </p>
+        <p class="text-neutral-600 text-sm mb-4">
+          Total: R$ {{ order.total.toFixed(2) }}
+        </p>
+
+        <button
+          (click)="moveOrder(order, 'producao'); $event.stopPropagation()"
+          type="button"
+          class="text-blue-700 hover:text-white border border-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+        >
+          Aceitar pedido
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+
+  <div
+    class="kanban-column rounded-lg p-4 max-h-[70vh] flex flex-col custom-scrollbar bg-gray-100"
+  >
+    <div class="flex items-center gap-2 mb-4 pl-2 text-base">
+      <i class="fa-solid fa-circle-half-stroke text-orange-600"></i>
+      <span class="font-semibold text-neutral-700">Em produção</span>
+    </div>
+    <div class="overflow-y-auto space-y-3 p-2 thin-scrollbar">
+      @for (order of ordersEmProducao; track order.id) {
+      <div
+        class="hover:drop-shadow-md active:scale-95 cursor-pointer kanban-card bg-gray-50 rounded-lg p-4 flex flex-col shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+        (click)="openOrderDialog(order)"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-neutral-800">#{{ order.id }}</span>
+          <span class="text-sm text-neutral-500">{{
+            order.data | date : "dd/MM/yyyy"
+          }}</span>
+        </div>
+        <p class="text-neutral-600 text-sm mb-2">
+          Cliente: {{ order.cliente }}
+        </p>
+        <p class="text-neutral-600 text-sm mb-4">
+          Total: R$ {{ order.total.toFixed(2) }}
+        </p>
+
+        <button
+          (click)="moveOrder(order, 'entrega'); $event.stopPropagation()"
+          class="w-full mt-auto border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white focus:ring-4 focus:outline-none focus:ring-orange-300 py-2 rounded-md transition-colors text-sm"
+        >
+          Mover para entrega
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+
+  <div
+    class="kanban-column rounded-lg p-4 max-h-[70vh] flex flex-col custom-scrollbar bg-gray-100"
+  >
+    <div class="flex items-center gap-2 mb-4 pl-2 text-base">
+      <i class="fa-solid fa-circle-check text-green-600"></i>
+      <span class="font-semibold text-neutral-700">Pronto para entrega</span>
+    </div>
+    <div class="overflow-y-auto space-y-3 p-2 thin-scrollbar">
+      @for (order of ordersProntosEntrega; track order.id) {
+      <div
+        class="hover:drop-shadow-md active:scale-95 cursor-pointer kanban-card bg-gray-50 rounded-lg p-4 flex flex-col shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+        (click)="openOrderDialog(order)"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-neutral-800">#{{ order.id }}</span>
+          <span class="text-sm text-neutral-500">{{
+            order.data | date : "dd/MM/yyyy"
+          }}</span>
+        </div>
+        <p class="text-neutral-600 text-sm mb-2">
+          Cliente: {{ order.cliente }}
+        </p>
+        <p class="text-neutral-600 text-sm mb-4">
+          Total: R$ {{ order.total.toFixed(2) }}
+        </p>
+
+        <button
+          (click)="completeOrder(order); $event.stopPropagation()"
+          class="w-full mt-auto border border-green-600 text-green-600 py-2 rounded-md hover:bg-green-600 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 transition-colors text-sm"
+        >
+          Concluir pedido
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Dialog -->
+<dialog
+  #orderDialog
+  class="modal p-6 bg-white rounded-lg shadow-xl w-full max-w-4xl"
+  (click)="closeOrderDialog()"
+>
+  @if (selectedOrder) {
+  <div (click)="$event.stopPropagation()">
+    <!-- Cabeçalho -->
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+      <div class="flex items-center gap-3">
+        <h2 class="text-xl font-bold text-neutral-800">
+          Pedido #{{ selectedOrder.id }}
+        </h2>
+        <span class="text-sm px-2 py-1 rounded-full" 
+              [ngClass]="{
+                'bg-blue-100 text-blue-700': selectedOrder.estado === 'analise',
+                'bg-orange-100 text-orange-700': selectedOrder.estado === 'producao',
+                'bg-green-100 text-green-700': selectedOrder.estado === 'entrega'
+              }">
+          {{ selectedOrder.estado }}
+        </span>
+      </div>
+      <button
+        (click)="closeOrderDialog()"
+        class="text-neutral-500 hover:text-neutral-700 transition-colors focus:outline-none"
+      >
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="flex">
+      <!-- Lado Esquerdo - Informações do Pedido -->
+      <div class="w-1/2 pr-6 border-r">
+        <div class="space-y-4">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-sm font-semibold text-neutral-600 mb-2">
+              <i class="fa-regular fa-clock mr-2"></i>Data e Hora
+            </h3>
+            <p class="text-neutral-800">
+              {{ selectedOrder.data | date : "dd/MM/yyyy HH:mm" }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-sm font-semibold text-neutral-600 mb-2">
+              <i class="fa-regular fa-user mr-2"></i>Cliente
+            </h3>
+            <p class="text-neutral-800">{{ selectedOrder.cliente }}</p>
+            <p class="text-neutral-600 text-sm mt-1">
+              <i class="fa-solid fa-phone mr-2"></i>{{ selectedOrder.contato }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-sm font-semibold text-neutral-600 mb-2">
+              <i class="fa-regular fa-credit-card mr-2"></i>Pagamento
+            </h3>
+            <p class="text-neutral-800">{{ selectedOrder.tipoPagamento }}</p>
+            <p class="text-neutral-600 font-medium mt-1">
+              Total: R$ {{ selectedOrder.total.toFixed(2) }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-sm font-semibold text-neutral-600 mb-2">
+              <i class="fa-solid fa-location-dot mr-2"></i>Local de Entrega
+            </h3>
+            <p class="text-neutral-800">{{ selectedOrder.local }}</p>
+            @if (selectedOrder.observacao) {
+              <p class="text-neutral-600 text-sm mt-2">
+                <i class="fa-regular fa-note-sticky mr-2"></i>
+                {{ selectedOrder.observacao }}
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Lado Direito - Itens do Pedido -->
+      <div class="w-1/2 pl-6">
+        <h3 class="text-lg font-semibold mb-4">Itens do Pedido</h3>
+        
+        <div class="space-y-3">
+          @for (item of selectedOrder.menuItens; track item.codigo) {
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <p class="font-medium text-neutral-800">
+                    1 x {{ item.nome }}
+                  </p>
+                  
+                  <!-- Ingredientes Removidos -->
+                  @for (ingrediente of item.ingredientes; track ingrediente.nome) {
+                    @if (!ingrediente.ativo) {
+                      <p class="text-red-600 text-sm mt-1">
+                        Sem {{ ingrediente.nome }}
+                      </p>
+                    }
+                  }
+                  
+                  <!-- Adicionais -->
+                  @for (adicional of item.adicionais; track adicional.nome) {
+                    <p class="text-neutral-600 text-sm mt-1">
+                      {{ adicional.quantidade }}x Adicional de {{ adicional.nome }}
+                      <span class="text-neutral-500">
+                        (+ R$ {{ (adicional.valor * adicional.quantidade).toFixed(2) }})
+                      </span>
+                    </p>
+                  }
+                </div>
+                
+                <p class="font-medium text-neutral-800 ml-4">
+                  R$ {{ item.valor.toFixed(2) }}
+                </p>
+              </div>
+            </div>
+          }
+          
+          <!-- Total -->
+          <div class="mt-6 pt-4 border-t flex justify-between items-center">
+            <span class="font-semibold text-neutral-700">Total do Pedido</span>
+            <span class="font-bold text-neutral-800 text-lg">
+              R$ {{ selectedOrder.total.toFixed(2) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão de Ação -->
+    <div class="mt-6 pt-4 border-t">
+      @switch (selectedOrder.estado) { 
+        @case ('analise') {
+          <button
+            (click)="moveOrder(selectedOrder, 'producao')"
+            class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors text-base font-medium"
+          >
+            Aceitar pedido
+          </button>
+        } 
+        @case ('producao') {
+          <button
+            (click)="moveOrder(selectedOrder, 'entrega')"
+            class="w-full bg-orange-600 text-white py-3 rounded-md hover:bg-orange-700 transition-colors text-base font-medium"
+          >
+            Mover para Entrega
+          </button>
+        } 
+        @case ('entrega') {
+          <button
+            (click)="completeOrder(selectedOrder)"
+            class="w-full bg-green-700 text-white py-3 rounded-md hover:bg-green-800 transition-colors text-base font-medium"
+          >
+            Concluir Pedido
+          </button>
+        } 
+      }
+    </div>
+  </div>
+  }
+</dialog>

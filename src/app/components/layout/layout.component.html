@@ -1,0 +1,122 @@
+<div class="flex flex-col h-screen">
+  <!-- Top Navigation -->
+  <nav
+    class="bg-white fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 pb-4"
+  >
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between h-16 pt-4">
+        <!-- Logo/Brand -->
+        <div class="flex items-center">
+          <div class="flex gap-3">
+            <a
+              routerLink="/app"
+              routerLinkActive="bg-neutral-900 text-white hover:bg-neutral-900"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center gap-2"
+            >
+              <i class="fa-solid fa-table-columns"></i>
+              <span class="text-sm">Pedidos</span>
+            </a>
+
+            <a
+              routerLink="/app/entregas"
+              routerLinkActive="bg-neutral-900 text-white hover:bg-neutral-900"
+              class="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center gap-2"
+            >
+              <i class="fa-solid fa-motorcycle"></i>
+              <span class="text-sm">Entregas</span>
+            </a>
+
+            <a
+              routerLink="/app/gerenciar-menu"
+              routerLinkActive="bg-neutral-900 text-white hover:bg-neutral-900"
+              class="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors flex items-center gap-2"
+            >
+              <i class="fa-solid fa-utensils"></i>
+              <span class="text-sm">Gerenciar Menu</span>
+            </a>
+
+            <a
+              routerLink="/app/historico"
+              routerLinkActive="bg-neutral-900 text-white hover:bg-neutral-900"
+              class="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors flex items-center gap-2"
+            >
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span class="text-sm">Histórico</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation Items -->
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <button
+              (click)="toggleProfileCard()"
+              class="w-10 h-10 rounded-lg overflow-hidden ml-4 hover:ring-2 hover:ring-neutral-200 transition-all duration-200"
+            >
+              <img
+                src="https://s3-sa-east-1.amazonaws.com/projetos-artes/fullsize%2F2015%2F10%2F12%2F16%2FLogo-165716_73236_163916519_1069725254.jpg"
+                alt="Perfil"
+                class="w-full h-full object-cover"
+              />
+            </button>
+
+            <div
+              *ngIf="showProfileCard"
+              class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg overflow-hidden"
+            >
+              <div class="p-4 border-b">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg overflow-hidden">
+                    <img
+                      src="https://s3-sa-east-1.amazonaws.com/projetos-artes/fullsize%2F2015%2F10%2F12%2F16%2FLogo-165716_73236_163916519_1069725254.jpg"
+                      alt="Perfil"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-neutral-900">
+                      Restaurante Silva
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <div class="py-2">
+                <a
+                  routerLink="/perfil"
+                  class="px-4 py-2 hover:bg-neutral-100 text-neutral-700 flex items-center gap-4"
+                >
+                  <i class="fa-solid fa-user-pen text-neutral-500"></i>
+                  <span>Editar Perfil</span>
+                </a>
+                <button
+                  class="w-full px-4 py-2 hover:bg-neutral-100 text-neutral-700 flex items-center gap-4"
+                >
+                  <i
+                    class="fa-solid fa-right-from-bracket text-neutral-500"
+                  ></i>
+                  <span>Sair</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container max-w-7xl mx-auto px-4 pb-8 pt-6 mt-[90px]">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold text-neutral-900" id="title">
+        {{ pageTitle }}
+      </h1>
+
+      <!-- Navigation Menu -->
+    </div>
+
+    <main class="flex-1">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
